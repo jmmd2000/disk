@@ -1,36 +1,42 @@
 import { withoutNulls } from "./utils/arrays";
 
-export enum DOM_TYPES {
+export enum NODE_TYPES {
   TEXT = "text",
   ELEMENT = "element",
   FRAGMENT = "fragment",
 }
 
-export type Basic_Node = {
+export type Element_Node = {
+  type: NODE_TYPES.ELEMENT;
   tag: string;
-  props: Record<string, unknown>;
+  props?: Record<string, any>;
   children: Node[];
-  type: DOM_TYPES.ELEMENT;
+  el?: HTMLElement;
+  listeners?: Record<string, EventListener>;
 };
 
 export type Text_Node = {
+  type: NODE_TYPES.TEXT;
   value: string;
-  type: DOM_TYPES.TEXT;
+  el?: Text;
+  listeners?: Record<string, EventListener>;
 };
 
 export type Fragment_Node = {
+  type: NODE_TYPES.FRAGMENT;
   children: Node[];
-  type: DOM_TYPES.FRAGMENT;
+  el?: HTMLElement;
+  listeners?: Record<string, EventListener>;
 };
 
-export type Node = Basic_Node | Text_Node | Fragment_Node;
+export type Node = Element_Node | Text_Node | Fragment_Node;
 
 export function h(tag: string, props = {}, ...children: Node[]): Node {
   return {
     tag,
     props,
     children: mapTextNodes(withoutNulls(children)),
-    type: DOM_TYPES.ELEMENT,
+    type: NODE_TYPES.ELEMENT,
   };
 }
 
@@ -40,14 +46,14 @@ function mapTextNodes(children: Node[]): Node[] {
 
 export function hString(string: string): Text_Node {
   return {
-    type: DOM_TYPES.TEXT,
+    type: NODE_TYPES.TEXT,
     value: string,
   };
 }
 
 export function hFragment(vNodes: Node[]): Fragment_Node {
   return {
-    type: DOM_TYPES.FRAGMENT,
+    type: NODE_TYPES.FRAGMENT,
     children: mapTextNodes(withoutNulls(vNodes)),
   };
 }
