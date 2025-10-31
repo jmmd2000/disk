@@ -26,3 +26,15 @@ export function addEventListeners(listeners: Record<string, EventListener> = {},
 
   return addedListeners as Record<string, EventListener>;
 }
+
+/**
+ * Removes a single event listener from an element.
+ * @param eventName - The name of the event to remove the listener for (e.g., 'click', 'input')
+ * @param handler - The event handler function to remove
+ * @param element - The DOM element to remove the listener from
+ */
+export function removeEventListeners(listeners: Record<string, EventListener> = {}, element: HTMLElement) {
+  Object.entries(listeners).forEach(([eventName, handler]) => {
+    element.removeEventListener(eventName, handler);
+  });
+}
