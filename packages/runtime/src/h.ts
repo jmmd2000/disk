@@ -43,22 +43,37 @@ export type Node = Element_Node | Text_Node | Fragment_Node;
  * h('div', { id: 'app' }, h('p', {}, 'Hello'))
  * h('button', { on: { click: handleClick } }, 'Click me')
  */
-export function h(tag: string, props = {}, ...children: Node[]): Node {
+export function h(tag: string, props: Record<string, unknown> = {}, ...children: Child[]): Node {
   return {
     tag,
     props,
-    children: mapTextNodes(withoutNulls(children)),
+    children: normalizeChildren(children),
     type: NODE_TYPES.ELEMENT,
   };
 }
 
 /**
  * Converts string children to text nodes, leaves other nodes unchanged.
- * @param children - Array of child nodes (may contain strings)
+ * Flattens nested arrays and drops nullish values so callers can pass
+ * either variadic children or a single array of children.
+ * @param children - Array of child nodes (may contain strings or nested arrays)
  * @returns Array of nodes (strings converted to text nodes)
  */
-function mapTextNodes(children: Node[]): Node[] {
-  return children.map((child) => (typeof child === "string" ? hString(child) : child));
+function normalizeChildren(children: Child[]): Node[] {
+  const normalized: Node[] = [];
+
+  children.forEach((child) => {
+    if (child == null) return;
+    if (Array.isArray(child)) {
+      normalized.push(...normalizeChildren(child));
+    } else if (typeof child === "string") {
+      normalized.push(hString(child));
+    } else {
+      normalized.push(child);
+    }
+  });
+
+  return withoutNulls(normalized);
 }
 
 /**
@@ -81,6 +96,8 @@ export function hString(string: string): Text_Node {
 export function hFragment(vNodes: Node[]): Fragment_Node {
   return {
     type: NODE_TYPES.FRAGMENT,
-    children: mapTextNodes(withoutNulls(vNodes)),
+    children: normalizeChildren(vNodes),
   };
 }
+
+type Child = Node | string | null | undefined | Child[];
