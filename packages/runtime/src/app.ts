@@ -3,13 +3,13 @@ import { destroyDOM } from "./destroy_dom";
 import { Node } from "./h";
 import { mountDOM } from "./mount_dom";
 
-interface CreateAppParams {
+interface CreateAppParams<State> {
   /** The initial application state */
-  state: any;
+  state: State;
   /** A function that renders the view based on the current state and provides an emit function */
-  view: (state: any, emit: (eventName: string, payload: any) => void) => Node;
+  view: (state: State, emit: EmitFn) => Node;
   /** An object mapping action names to reducer functions that update the state */
-  reducers: Record<string, (state: any, payload: any) => any>;
+  reducers: ReducersMap<State>;
 }
 
 /**
@@ -20,13 +20,13 @@ interface CreateAppParams {
  * @param reducers - An object mapping action names to reducer functions that update the state
  * @returns An object with mount and unmount methods to control the application lifecycle
  */
-export function createApp({ state, view, reducers }: CreateAppParams) {
+export function createApp<State>({ state, view, reducers }: CreateAppParams<State>) {
   let parentElement: HTMLElement | null = null;
   let vdom: Node | null = null;
 
   const dispatcher = new Dispatcher();
   // Rerender the app after every command.
-  const subscriptions = [dispatcher.afterEveryCommand(renderApp)];
+  const subscriptions: Array<() => void> = [dispatcher.afterEveryCommand(renderApp)];
 
   /**
    * Emits an event by dispatching it through the dispatcher.
@@ -34,7 +34,7 @@ export function createApp({ state, view, reducers }: CreateAppParams) {
    * @param eventName - The name of the event/command to dispatch
    * @param payload - The payload data to pass with the event
    */
-  function emit(eventName: string, payload: any) {
+  function emit(eventName: string, payload: unknown) {
     dispatcher.dispatch(eventName, payload);
   }
 
@@ -67,8 +67,8 @@ export function createApp({ state, view, reducers }: CreateAppParams) {
      *
      * @param parentElement - The DOM element to mount the application to
      */
-    mount(parentElement: HTMLElement) {
-      parentElement = parentElement;
+    mount(_parentElement: HTMLElement) {
+      parentElement = _parentElement;
       renderApp();
     },
 
@@ -83,3 +83,6 @@ export function createApp({ state, view, reducers }: CreateAppParams) {
     },
   };
 }
+
+type EmitFn = (eventName: string, payload: unknown) => void;
+type ReducersMap<State> = Record<string, (state: State, payload: unknown) => State>;

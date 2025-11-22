@@ -4,4 +4,6 @@
 
 # 💿 disk
 
+[![npm version](https://img.shields.io/npm/v/disk-js.svg)](https://www.npmjs.com/package/disk-js)
+
 A custom frontend framework, built as a learning exercise following along with [Build Your Own Frontend Framework](https://github.com/angelsolaorbaiceta/fe-fwk-book) by Ángel Solà Orbaiceta.

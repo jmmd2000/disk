@@ -5,9 +5,9 @@
  */
 export class Dispatcher {
   /** Map of command names to arrays of handler functions that subscribe to those commands. */
-  #subs = new Map<string, ((...args: any[]) => void)[]>();
+  #subs = new Map<string, CommandHandler[]>();
   /** Array of handler functions that are executed after every command is dispatched. */
-  #afterHandlers = [] as ((...args: any[]) => void)[];
+  #afterHandlers: AfterHandler[] = [];
 
   /**
    * Subscribes a handler function to a specific command name.
@@ -17,7 +17,7 @@ export class Dispatcher {
    * @param handler - The handler function to execute when the command is dispatched
    * @returns A function that unsubscribes the handler, or an empty function if the handler was already registered
    */
-  subscribe(commandName: string, handler: (...args: any[]) => void) {
+  subscribe(commandName: string, handler: CommandHandler) {
     if (!this.#subs.has(commandName)) {
       this.#subs.set(commandName, []);
     }
@@ -46,7 +46,7 @@ export class Dispatcher {
    * @param handler - The handler function to execute after each command
    * @returns A function that unregisters the handler
    */
-  afterEveryCommand(handler: (...args: any[]) => void) {
+  afterEveryCommand(handler: AfterHandler) {
     this.#afterHandlers.push(handler);
 
     return () => {
@@ -62,7 +62,7 @@ export class Dispatcher {
    * @param commandName - The name of the command to dispatch
    * @param payload - The payload data to pass to the command handlers
    */
-  dispatch(commandName: string, payload: any) {
+  dispatch(commandName: string, payload: unknown) {
     if (this.#subs.has(commandName)) {
       this.#subs.get(commandName)?.forEach((handler) => handler(payload));
     } else {
@@ -72,3 +72,6 @@ export class Dispatcher {
     this.#afterHandlers.forEach((handler) => handler());
   }
 }
+
+type CommandHandler = (payload: unknown) => void;
+type AfterHandler = () => void;

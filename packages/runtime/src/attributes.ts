@@ -1,16 +1,19 @@
+type StyleRecord = Record<string, string | number | null | undefined>;
+
 /**
  * Sets multiple attributes, classes, and styles on a DOM element.
  * @param element - The DOM element to set attributes on
  * @param attrs - An object containing attributes, class, style, and event listeners
  */
-export function setAttributes(element: HTMLElement, attrs: Record<string, any>) {
+export function setAttributes(element: HTMLElement, attrs: Record<string, unknown>) {
   const { class: className, style, ...rest } = attrs;
 
   if (className) setClass(element, className);
 
-  if (style) {
-    Object.entries(style as Record<string, any>).forEach(([prop, value]) => {
-      setStyle(element, prop, value);
+  if (style && typeof style === "object") {
+    Object.entries(style as StyleRecord).forEach(([prop, value]) => {
+      if (value == null) removeStyle(element, prop);
+      else setStyle(element, prop, value);
     });
   }
 
@@ -24,12 +27,18 @@ export function setAttributes(element: HTMLElement, attrs: Record<string, any>) 
  * @param element - The DOM element to set the class on
  * @param className - A string class name or array of class names
  */
-function setClass(element: HTMLElement, className: string) {
+function setClass(element: HTMLElement, className: unknown) {
   element.className = "";
 
-  if (typeof className === "string") element.className = className;
+  if (typeof className === "string") {
+    element.className = className;
+    return;
+  }
 
-  if (Array.isArray(className)) element.classList.add(...className);
+  if (Array.isArray(className)) {
+    const tokens = className.filter((value): value is string => typeof value === "string");
+    if (tokens.length) element.classList.add(...tokens);
+  }
 }
 
 /**
@@ -38,8 +47,8 @@ function setClass(element: HTMLElement, className: string) {
  * @param name - The CSS property name (e.g. color, fontSize)
  * @param value - The CSS property value (e.g. red, 12px)
  */
-function setStyle(element: HTMLElement, name: string, value: string) {
-  element.style.setProperty(name, value);
+function setStyle(element: HTMLElement, name: string, value: string | number) {
+  element.style.setProperty(name, String(value));
 }
 
 /**
@@ -57,11 +66,17 @@ function removeStyle(element: HTMLElement, name: string) {
  * @param name - The attribute name
  * @param value - The attribute value (null/undefined removes the attribute)
  */
-export function setAttribute(element: HTMLElement, name: string, value: string) {
-  if (value == null) removeAttribute(element, name);
-  else if (name.startsWith("data-")) element.setAttribute(name, value);
-  // Cast to any because HTMLElement has no index signature for dynamic property names
-  else (element as any)[name] = value;
+export function setAttribute(element: HTMLElement, name: string, value: unknown) {
+  if (value == null) {
+    removeAttribute(element, name);
+  } else if (typeof value === "boolean") {
+    if (value) element.setAttribute(name, "");
+    else removeAttribute(element, name);
+  } else if (name.startsWith("data-")) {
+    element.setAttribute(name, String(value));
+  } else {
+    (element as HTMLElement & Record<string, unknown>)[name] = value;
+  }
 }
 
 /**
@@ -70,7 +85,6 @@ export function setAttribute(element: HTMLElement, name: string, value: string) 
  * @param name - The name of the attribute to remove
  */
 export function removeAttribute(element: HTMLElement, name: string) {
-  // same as above
-  (element as any)[name] = null;
+  (element as HTMLElement & Record<string, unknown>)[name] = null;
   element.removeAttribute(name);
 }

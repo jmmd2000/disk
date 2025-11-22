@@ -1,3 +1,4 @@
+import { DOMEventHandler } from "./events";
 import { withoutNulls } from "./utils/arrays";
 
 /** Types of virtual DOM nodes */
@@ -10,24 +11,24 @@ export enum NODE_TYPES {
 export type Element_Node = {
   type: NODE_TYPES.ELEMENT;
   tag: string;
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
   children: Node[];
   el?: HTMLElement;
-  listeners?: Record<string, EventListener>;
+  listeners?: Record<string, DOMEventHandler>;
 };
 
 export type Text_Node = {
   type: NODE_TYPES.TEXT;
   value: string;
   el?: Text;
-  listeners?: Record<string, EventListener>;
+  listeners?: Record<string, DOMEventHandler>;
 };
 
 export type Fragment_Node = {
   type: NODE_TYPES.FRAGMENT;
   children: Node[];
   el?: HTMLElement;
-  listeners?: Record<string, EventListener>;
+  listeners?: Record<string, DOMEventHandler>;
 };
 
 export type Node = Element_Node | Text_Node | Fragment_Node;

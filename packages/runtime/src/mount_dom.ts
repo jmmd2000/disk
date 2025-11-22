@@ -1,4 +1,5 @@
-import { addEventListeners } from "./events";
+import { DOMEventHandler, addEventListeners } from "./events";
+import { setAttributes } from "./attributes";
 import { Element_Node, Fragment_Node, NODE_TYPES, Node, Text_Node } from "./h";
 
 /**
@@ -83,9 +84,11 @@ function createElementNode(vdom: Element_Node, parentElement: HTMLElement) {
  * @param props - An object containing attributes and event listeners
  * @param vdom - The virtual DOM node to store props on
  */
-function addProps(element: HTMLElement, props: Record<string, any>, vdom: Node) {
+function addProps(element: HTMLElement, props: Record<string, unknown>, vdom: Node) {
   const { on: events, ...attrs } = props;
 
-  if (events) vdom.listeners = addEventListeners(events, element);
-  //   setAttributes(element, attrs);
+  if (events && typeof events === "object") {
+    vdom.listeners = addEventListeners(events as Record<string, DOMEventHandler>, element);
+  }
+  if (Object.keys(attrs).length > 0) setAttributes(element, attrs);
 }

@@ -1,8 +1,9 @@
 {
-  "name": "disk",
+  "name": "disk-js",
   "version": "1.0.0",
   "description": "A custom frontend framework.",
   "main": "dist/disk.js",
+  "type": "module",
   "types": "dist/disk.d.ts",
   "files": [
     "dist/disk.js",
@@ -20,6 +21,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmmd2000/disk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jmmd2000/disk/issues"
+  },
+  "homepage": "https://github.com/jmmd2000/disk#readme",
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
     "@eslint/js": "^9.38.0",
