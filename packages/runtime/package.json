@@ -1,6 +1,6 @@
 {
   "name": "disk-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A custom frontend framework.",
   "main": "dist/disk.js",
   "type": "module",
