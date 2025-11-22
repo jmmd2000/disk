@@ -1,11 +1,11 @@
 {
   "name": "disk",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/disk.ts",
+  "description": "A custom frontend framework.",
+  "main": "dist/disk.js",
   "types": "dist/disk.d.ts",
   "files": [
-    "dist/disk.ts",
+    "dist/disk.js",
     "dist/disk.d.ts"
   ],
   "scripts": {

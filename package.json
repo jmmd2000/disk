@@ -4,11 +4,12 @@
   "description": "A custom frontend framework.",
   "private": true,
   "workspaces": [
-	  "packages/runtime"
+    "packages/runtime",
+    "packages/examples"
   ],
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve:examples": "npx http-server . -o ./examples/ -bg"
   },
   "keywords": [],
   "author": "",
